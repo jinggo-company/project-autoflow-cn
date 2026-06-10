@@ -1,11 +1,11 @@
 # TEST_CASES — AutoFlow CN 全局测试案例框架
 
-> Case-ID 对应 Gate G-2026-00091 中的 Acceptance Criteria。
+> Case-ID 对应 `docs/PRD.md` 中的 `AC-N` 验收标准。
 > 本文档为全局测试框架，具体增量案例随各 T-* 开发任务补充。
 
 ## TC-001: Activepieces Docker Compose 启动验证
 
-- **对应 AC**: Gate G-2026-00091 dev_work ①
+- **对应 AC**: AC-1 Docker Compose 一键启动；AC-2 健康检查返回 ok
 - **适用任务**: T-2026-00285
 - **测试步骤**:
   1. 执行 `docker compose up -d`
@@ -17,7 +17,7 @@
 
 ## TC-002: 基础工作流创建与执行
 
-- **对应 AC**: Gate G-2026-00091 e2e_strategy ①
+- **对应 AC**: AC-3 Webhook Trigger + HTTP Request Action 工作流成功执行
 - **适用任务**: T-2026-00285
 - **测试步骤**:
   1. 通过 `POST /api/v1/workflows/webhook-http` 创建 Webhook Trigger + HTTP Request Action 工作流
@@ -28,7 +28,7 @@
 
 ## TC-003: 中文 UI 本地化
 
-- **对应 AC**: Gate G-2026-00091 dev_work ②
+- **对应 AC**: AC-4 Builder 中文文案；AC-5 中文错误消息与异常工作流触发
 - **适用任务**: T-2026-00285
 - **测试步骤**:
   1. 启动服务
