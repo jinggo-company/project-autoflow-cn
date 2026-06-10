@@ -35,20 +35,24 @@ AutoFlow CN 由三层架构组成：
 
 ## 2. 模块划分
 
-### 2.0 F1 本地 Activepieces 兼容壳 (`src/`)
+### 2.0 F1/F2 本地 Activepieces 兼容壳 (`src/`)
 
 ```
 src/
 ├── server.ts                  # Fastify API 服务入口
 ├── workflow-store.ts          # 内存工作流与执行记录存储
-├── workflow-runner.ts         # Webhook Trigger + HTTP Request Action 执行器
+├── workflow-runner.ts         # Webhook Trigger + HTTP/Piece Action 执行器
+├── cn-pieces.ts               # 钉钉/企业微信 Piece 清单、请求体构造与发送动作
 ├── i18n/
 │   └── builder-zh.ts          # Builder 中文界面与错误消息文案
 └── __tests__/
-    └── f1.spec.ts             # TC-001/TC-002/TC-003 自动化测试
+    ├── f1.spec.ts             # TC-001/TC-002/TC-003 自动化测试
+    └── pieces.spec.ts         # TC-004/TC-005 自动化测试
 ```
 
 F1 兼容壳负责在上游 Activepieces 完整接入前锁定验收契约：Docker Compose 暴露 3000 端口，`/api/v1/health` 返回 `ok`，示例工作流可创建/触发/查询，Builder 关键界面文本和错误消息返回中文。该层没有长期业务状态，重启后数据清空；后续接入上游时保留 API 契约并将执行状态切换到 Activepieces Worker 与 PostgreSQL。
+
+F2 在兼容壳中新增钉钉和企业微信 Piece MVP。`/api/v1/pieces` 暴露 Piece 加载清单；`/api/v1/workflows/webhook-piece` 创建 Webhook Trigger → Piece Action 工作流；执行器根据 `PIECE_ACTION` 调用 `cn-pieces.ts`，向钉钉或企业微信 Webhook/mock server 发送协议 JSON。当前 mock 验证范围包括请求头、请求体、HTTP 成功响应和工作流 `SUCCEEDED` 状态；真实平台鉴权、审批事件、客户联系事件留到拿到测试凭证后补充。
 
 ### 2.1 SaaS 管理控制台 (`saas-console/`)
 

@@ -67,12 +67,23 @@
 | Docker Compose | 2.24.x+ | 一键启动本地服务 |
 | pnpm | 10.33.0 | 包管理与测试命令，通过 `packageManager` 锁定 |
 
-### F1 兼容边界
+## F2 钉钉与企业微信 Piece MVP 实现栈
 
-- 健康检查路径固定为 `/api/v1/health`，响应必须包含 `ok`。
-- 基础工作流验证固定覆盖 Webhook Trigger + HTTP Request Action，执行成功状态为 `SUCCEEDED`。
-- Builder 本地化由 `/api/v1/i18n/builder` 输出中文界面文本和中文错误消息，供前端或上游补丁读取。
-- 当前版本使用内存存储工作流与执行记录，仅用于本地验收；生产版本迁移到 PostgreSQL/Redis。
+F2 在 F1 本地验证壳上补充可自动化验收的中国生态 Piece 契约。当前不依赖真实外部凭证，使用本地 mock HTTP server 验证发送消息请求体和错误路径；后续接入 `@activepieces/pieces-framework` 时保持 Piece 名称、Action 名称和请求契约稳定。
+
+| 组件 | 版本 | 说明 |
+|------|------|------|
+| Fastify | 4.x | 暴露 Piece 清单、Action 执行和 Webhook → Piece 工作流 API |
+| TypeScript | 5.x | Piece 类型、请求体构造和执行器类型安全 |
+| Vitest | 1.x | TC-004/TC-005 自动化测试，内嵌 mock provider |
+| fetch API | Node.js 20 内置 | 向钉钉/企业微信 Webhook 或 mock server 发送 JSON 请求 |
+
+### F2 兼容边界
+
+- Piece 清单必须通过 `/api/v1/pieces` 暴露 `dingtalk` 和 `wechat-work`，便于 Activepieces 加载检查。
+- 钉钉 Action 固定为 `sendTextMessage`，发送 `msgtype=text`、`text.content`、`at.atMobiles`、`at.isAtAll=false`。
+- 企业微信 Action 固定为 `sendTextMessage`，发送 `msgtype=text`、`text.content`、`text.mentioned_mobile_list`。
+- mock 覆盖 HTTP 请求体、`x-autoflow-piece` 请求头、成功响应；真实平台 token、签名、审批流/客户联系事件不在 F2 范围内。
 
 ```
 ┌───────────────────────────────────────────────────┐

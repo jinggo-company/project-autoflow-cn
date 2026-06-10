@@ -41,11 +41,23 @@ curl -s http://localhost:3000/api/v1/health
 | `/api/v1/executions/:id` | GET | 查询执行状态，成功时为 `SUCCEEDED` |
 | `/api/v1/i18n/builder` | GET | 返回 Builder 中文界面文案和错误消息 |
 
+### F2 钉钉与企业微信 Piece 验证接口
+
+F2 新增钉钉和企业微信两个中国生态 Piece MVP，使用协议稳定的本地 mock HTTP server 覆盖外部开放平台调用。mock 覆盖范围为机器人 Webhook 消息发送请求体、请求头、HTTP 成功/失败响应；真实钉钉/企业微信开放平台鉴权、审批流回调和客户联系 API 留到后续真实凭证验收。
+
+| 接口 | 方法 | 说明 |
+|------|------|------|
+| `/api/v1/pieces` | GET | 返回可被 Activepieces 加载的 Piece 清单，包含 `dingtalk` 与 `wechat-work` |
+| `/api/v1/workflows/webhook-piece` | POST | 创建 Webhook Trigger → 钉钉/企业微信发送消息 Action 工作流 |
+| `/api/v1/pieces/dingtalk/actions/send-message` | POST | 直接执行钉钉发送文本消息 Action |
+| `/api/v1/pieces/wechat-work/actions/send-message` | POST | 直接执行企业微信发送文本消息 Action |
+
 ### 测试
 
 ```bash
 pnpm install
 pnpm test -- --runInBand
+pnpm run test:pieces -- --filter dingtalk --filter wechat-work
 ```
 
 完整验收命令：
