@@ -1,5 +1,6 @@
+import { sendPieceMessage } from './cn-pieces.js';
 import { builderZh } from './i18n/builder-zh.js';
-import type { WebhookHttpWorkflow, WorkflowExecution, WorkflowStore } from './workflow-store.js';
+import type { WebhookHttpWorkflow, WebhookPieceWorkflow, WorkflowExecution, WorkflowStore } from './workflow-store.js';
 
 export async function runWebhookHttpWorkflow(
   store: WorkflowStore,
@@ -24,6 +25,41 @@ export async function runWebhookHttpWorkflow(
       input,
       output: {
         message: error instanceof Error ? error.message : builderZh.errors.httpActionFailed,
+      },
+      createdAt: new Date().toISOString(),
+    });
+  }
+}
+
+export async function runWebhookPieceWorkflow(
+  store: WorkflowStore,
+  workflow: WebhookPieceWorkflow,
+  input: unknown,
+): Promise<WorkflowExecution> {
+  try {
+    const response = await sendPieceMessage(workflow.action.piece, {
+      webhookUrl: workflow.action.webhookUrl,
+      message: workflow.action.message,
+      title: workflow.action.title,
+      atMobiles: workflow.action.atMobiles,
+    });
+
+    return store.saveExecution({
+      id: crypto.randomUUID(),
+      workflowId: workflow.id,
+      status: 'SUCCEEDED',
+      input,
+      output: response,
+      createdAt: new Date().toISOString(),
+    });
+  } catch (error) {
+    return store.saveExecution({
+      id: crypto.randomUUID(),
+      workflowId: workflow.id,
+      status: 'FAILED',
+      input,
+      output: {
+        message: error instanceof Error ? error.message : '中国生态 Piece 执行失败',
       },
       createdAt: new Date().toISOString(),
     });

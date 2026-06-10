@@ -41,22 +41,36 @@
 ## TC-004: 钉钉 Piece — 消息推送
 
 - **对应 AC**: Gate G-2026-00091 dev_work ③
+- **适用任务**: T-2026-00286
+- **mock 契约**:
+  - mock server 接收 `POST` JSON 请求。
+  - 请求头包含 `x-autoflow-piece: dingtalk`。
+  - 请求体固定为钉钉机器人文本消息格式：`msgtype=text`、`text.content`、`at.atMobiles`、`at.isAtAll=false`。
+  - mock 返回 `{ "errcode": 0, "errmsg": "ok" }` 表示平台成功。
 - **测试步骤**:
-  1. 配置钉钉 Piece 凭证（测试应用或 mock）
-  2. 创建 Webhook Trigger → 钉钉发送消息 Action 工作流
+  1. 启动本地 API 服务和测试内嵌 mock HTTP server
+  2. 通过 `POST /api/v1/workflows/webhook-piece` 创建 Webhook Trigger → 钉钉发送消息 Action 工作流
   3. 触发 Webhook
-  4. 验证钉钉收到消息（mock 验证 HTTP 请求）
-- **预期结果**: 钉钉收到正确的消息推送
+  4. 验证 mock 收到正确 HTTP 请求
+  5. 执行 `pnpm run test:pieces -- --filter dingtalk` 中的 `TC-004` 自动化断言
+- **预期结果**: mock server 收到正确钉钉消息推送请求，工作流执行状态为 `SUCCEEDED`
 
 ## TC-005: 企业微信 Piece — 消息推送
 
 - **对应 AC**: Gate G-2026-00091 dev_work ④
+- **适用任务**: T-2026-00286
+- **mock 契约**:
+  - mock server 接收 `POST` JSON 请求。
+  - 请求头包含 `x-autoflow-piece: wechat-work`。
+  - 请求体固定为企业微信群机器人文本消息格式：`msgtype=text`、`text.content`、`text.mentioned_mobile_list`。
+  - mock 返回 `{ "errcode": 0, "errmsg": "ok" }` 表示平台成功。
 - **测试步骤**:
-  1. 配置企业微信 Piece 凭证（测试企业或 mock）
-  2. 创建 Webhook Trigger → 企微发送消息 Action 工作流
+  1. 启动本地 API 服务和测试内嵌 mock HTTP server
+  2. 通过 `POST /api/v1/workflows/webhook-piece` 创建 Webhook Trigger → 企业微信发送消息 Action 工作流
   3. 触发 Webhook
-  4. 验证企微收到消息（mock 验证 HTTP 请求）
-- **预期结果**: 企业微信收到正确的消息推送
+  4. 验证 mock 收到正确 HTTP 请求
+  5. 执行 `pnpm run test:pieces -- --filter wechat-work` 中的 `TC-005` 自动化断言
+- **预期结果**: mock server 收到正确企业微信消息推送请求，工作流执行状态为 `SUCCEEDED`
 
 ## TC-006: 飞书 Piece — 消息推送
 

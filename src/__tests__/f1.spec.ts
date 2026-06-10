@@ -1,16 +1,29 @@
 import { describe, expect, it } from 'vitest';
+import type { FastifyInstance } from 'fastify';
 import { buildServer } from '../server.js';
+
+async function listenOnSafePort(app: FastifyInstance): Promise<string> {
+  for (let attempt = 0; attempt < 20; attempt += 1) {
+    const port = 31000 + Math.floor(Math.random() * 8000);
+    try {
+      await app.listen({ port, host: '127.0.0.1' });
+      return `http://127.0.0.1:${port}`;
+    } catch (error) {
+      if (attempt === 19) {
+        throw error;
+      }
+    }
+  }
+
+  throw new Error('测试服务启动失败');
+}
 
 async function withServer<T>(run: (baseUrl: string) => Promise<T>): Promise<T> {
   const app = buildServer();
-  await app.listen({ port: 0, host: '127.0.0.1' });
-  const address = app.server.address();
-  if (!address || typeof address === 'string') {
-    throw new Error('测试服务启动失败');
-  }
+  const baseUrl = await listenOnSafePort(app);
 
   try {
-    return await run(`http://127.0.0.1:${address.port}`);
+    return await run(baseUrl);
   } finally {
     await app.close();
   }
