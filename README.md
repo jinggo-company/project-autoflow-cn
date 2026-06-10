@@ -18,6 +18,8 @@ Zapier 中国替代 — 可视化工作流编排 + 中国生态原生集成 + MC
 
 ## 本地运行
 
+F1 开发任务提供一个 Activepieces 兼容的本地运行壳，用于验证一键启动、核心工作流执行链路和 Builder 中文化文案。后续接入上游 Activepieces 时，应保持下列健康检查与验证接口兼容。
+
 ```bash
 # 启动开发环境
 docker compose up -d
@@ -27,6 +29,29 @@ sleep 30
 
 # 健康检查
 curl -s http://localhost:3000/api/v1/health
+```
+
+### F1 验证接口
+
+| 接口 | 方法 | 说明 |
+|------|------|------|
+| `/api/v1/health` | GET | 返回 `{ "status": "ok" }`，用于 Docker Compose 健康检查 |
+| `/api/v1/workflows/webhook-http` | POST | 创建 Webhook Trigger + HTTP Request Action 示例工作流 |
+| `/api/v1/workflows/:id/trigger` | POST | 触发示例工作流并写入执行记录 |
+| `/api/v1/executions/:id` | GET | 查询执行状态，成功时为 `SUCCEEDED` |
+| `/api/v1/i18n/builder` | GET | 返回 Builder 中文界面文案和错误消息 |
+
+### 测试
+
+```bash
+pnpm install
+pnpm test -- --runInBand
+```
+
+完整验收命令：
+
+```bash
+docker compose up -d && sleep 30 && curl -s http://localhost:3000/api/v1/health | grep -o ok && pnpm test -- --runInBand
 ```
 
 ## 技术架构文档

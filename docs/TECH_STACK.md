@@ -54,7 +54,25 @@
 | Model Context Protocol SDK | TypeScript 实现，MCP 协议适配 |
 | 官方 MCP Server 列表 | 上游社区维护，400+ Server |
 
-## 依赖关系
+## F1 本地部署与中文化实现栈
+
+本任务先交付 Activepieces 兼容的本地验证壳，确保 Docker Compose、健康检查、基础工作流与中文 Builder 文案可自动化验收；后续再替换为上游 Activepieces 0.48.x 镜像和补丁集。
+
+| 组件 | 版本 | 说明 |
+|------|------|------|
+| Node.js | 20.x LTS | F1 本地 API 服务运行时 |
+| TypeScript | 5.x | 服务与测试类型安全 |
+| Fastify | 4.x | 轻量 HTTP API，模拟 Activepieces 验收接口 |
+| Vitest | 1.x | TC-001/TC-002/TC-003 自动化测试 |
+| Docker Compose | 2.24.x+ | 一键启动本地服务 |
+| pnpm | 10.33.0 | 包管理与测试命令，通过 `packageManager` 锁定 |
+
+### F1 兼容边界
+
+- 健康检查路径固定为 `/api/v1/health`，响应必须包含 `ok`。
+- 基础工作流验证固定覆盖 Webhook Trigger + HTTP Request Action，执行成功状态为 `SUCCEEDED`。
+- Builder 本地化由 `/api/v1/i18n/builder` 输出中文界面文本和中文错误消息，供前端或上游补丁读取。
+- 当前版本使用内存存储工作流与执行记录，仅用于本地验收；生产版本迁移到 PostgreSQL/Redis。
 
 ```
 ┌───────────────────────────────────────────────────┐
