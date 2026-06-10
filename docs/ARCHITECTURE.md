@@ -35,6 +35,21 @@ AutoFlow CN 由三层架构组成：
 
 ## 2. 模块划分
 
+### 2.0 F1 本地 Activepieces 兼容壳 (`src/`)
+
+```
+src/
+├── server.ts                  # Fastify API 服务入口
+├── workflow-store.ts          # 内存工作流与执行记录存储
+├── workflow-runner.ts         # Webhook Trigger + HTTP Request Action 执行器
+├── i18n/
+│   └── builder-zh.ts          # Builder 中文界面与错误消息文案
+└── __tests__/
+    └── f1.spec.ts             # TC-001/TC-002/TC-003 自动化测试
+```
+
+F1 兼容壳负责在上游 Activepieces 完整接入前锁定验收契约：Docker Compose 暴露 3000 端口，`/api/v1/health` 返回 `ok`，示例工作流可创建/触发/查询，Builder 关键界面文本和错误消息返回中文。该层没有长期业务状态，重启后数据清空；后续接入上游时保留 API 契约并将执行状态切换到 Activepieces Worker 与 PostgreSQL。
+
 ### 2.1 SaaS 管理控制台 (`saas-console/`)
 
 ```

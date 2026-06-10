@@ -6,30 +6,36 @@
 ## TC-001: Activepieces Docker Compose 启动验证
 
 - **对应 AC**: Gate G-2026-00091 dev_work ①
+- **适用任务**: T-2026-00285
 - **测试步骤**:
   1. 执行 `docker compose up -d`
   2. 等待 30 秒
   3. 执行 `curl -s http://localhost:3000/api/v1/health`
+  4. 执行 `pnpm test -- --runInBand` 中的 `TC-001` 自动化断言
 - **预期结果**: HTTP 200，响应包含 `"ok"`
 - **验证命令**: `curl -s http://localhost:3000/api/v1/health | grep -o ok`
 
 ## TC-002: 基础工作流创建与执行
 
 - **对应 AC**: Gate G-2026-00091 e2e_strategy ①
+- **适用任务**: T-2026-00285
 - **测试步骤**:
-  1. 通过 API 创建 Webhook Trigger + HTTP Request Action 工作流
-  2. 触发 Webhook
-  3. 查询执行记录
+  1. 通过 `POST /api/v1/workflows/webhook-http` 创建 Webhook Trigger + HTTP Request Action 工作流
+  2. 通过 `POST /api/v1/workflows/:id/trigger` 触发 Webhook
+  3. 通过 `GET /api/v1/executions/:id` 查询执行记录
+  4. 执行 `pnpm test -- --runInBand` 中的 `TC-002` 自动化断言
 - **预期结果**: 工作流执行状态为 `SUCCEEDED`
 
 ## TC-003: 中文 UI 本地化
 
 - **对应 AC**: Gate G-2026-00091 dev_work ②
+- **适用任务**: T-2026-00285
 - **测试步骤**:
   1. 启动服务
-  2. 访问 Builder 界面
-  3. 检查界面文本为中文
+  2. 访问 `GET /api/v1/i18n/builder`
+  3. 检查 Builder 关键界面文本为中文
   4. 触发错误，检查错误消息为中文
+  5. 执行 `pnpm test -- --runInBand` 中的 `TC-003` 自动化断言
 - **预期结果**: Builder 界面和错误消息均为中文
 
 ## TC-004: 钉钉 Piece — 消息推送
